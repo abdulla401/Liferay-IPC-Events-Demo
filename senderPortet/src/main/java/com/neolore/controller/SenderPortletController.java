@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.EventMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
@@ -30,9 +31,13 @@ public class SenderPortletController {
 	 * render method will always be this method
 	 */
 	@RenderMapping
-	public String handleRenderRequest(RenderRequest request,RenderResponse response,Model model){
+	public ModelAndView handleRenderRequest(RenderRequest request,RenderResponse response,Model model){
 		System.out.println("SenderPortlet default render");
-		return "senderPortlet";
+		String color = (String)request.getPortletSession().getAttribute("color");
+		
+//		return "defaultRender";
+		return new ModelAndView("senderPortlet", "color", color); 
+		
 	}
 
 	@RenderMapping(params = "action=renderTwo") 
@@ -42,10 +47,10 @@ public class SenderPortletController {
 	}
 	
 	@RenderMapping(params = "action=renderAfterAction") 
-	public String testRenderMethod(RenderRequest request, RenderResponse response){
+	public ModelAndView testRenderMethod(RenderRequest request, RenderResponse response){
 		log.info("In renderAfterAction method");		
-		System.out.println("stt");
-		return "senderPortlet";
+		String color = (String)request.getPortletSession().getAttribute("color");
+		return new ModelAndView("senderPortlet", "color", color); 
 	}
 	
 	@ActionMapping(params = "action=actionOne") 
@@ -64,10 +69,11 @@ public class SenderPortletController {
 		return "action2";
 	}
 	@EventMapping
-	public void handleEventRequest(EventRequest request, EventResponse arg1)
+	public void handleEventRequest(EventRequest request, EventResponse response)
 			throws Exception {
-		 	 javax.portlet.Event event = request.getEvent();
-		 	 System.out.println("event has been fired 1");
+			javax.portlet.Event event = request.getEvent();
+		 	String value  = (String)event.getValue();
+		 	request.getPortletSession().setAttribute("color", value);		 	 
 		
 	}
 	
